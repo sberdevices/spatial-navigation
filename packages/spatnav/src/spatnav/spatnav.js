@@ -1959,62 +1959,64 @@
     });
 })();
 
-let currentSpatialNavigationContainer = null;
+export const setDefaultScrollTo = () => {
+    let currentSpatialNavigationContainer = null;
 
-document.addEventListener('navbeforefocus', (e) => {
-    if (e.target instanceof HTMLElement) {
-        e.preventDefault();
+    document.addEventListener('navbeforefocus', (e) => {
+        if (e.target instanceof HTMLElement) {
+            e.preventDefault();
 
-        let { target } = e;
+            let { target } = e;
 
-        // focus on the first element when changing spatnav container
-        const nextSpatialNavigationContainer = target.getSpatialNavigationContainer();
+            // focus on the first element when changing spatnav container
+            const nextSpatialNavigationContainer = target.getSpatialNavigationContainer();
 
-        if (currentSpatialNavigationContainer && currentSpatialNavigationContainer !== nextSpatialNavigationContainer) {
-            if (nextSpatialNavigationContainer.__lastElementFocused) {
-                target = nextSpatialNavigationContainer.__lastElementFocused;
-            } else {
-                [target] = nextSpatialNavigationContainer.focusableAreas({ mode: 'all' });
+            if (currentSpatialNavigationContainer && currentSpatialNavigationContainer !== nextSpatialNavigationContainer) {
+                if (nextSpatialNavigationContainer.__lastElementFocused) {
+                    target = nextSpatialNavigationContainer.__lastElementFocused;
+                } else {
+                    [target] = nextSpatialNavigationContainer.focusableAreas({ mode: 'all' });
+                }
+                // target.focus();
             }
-            // target.focus();
-        }
 
-        currentSpatialNavigationContainer = nextSpatialNavigationContainer;
-        currentSpatialNavigationContainer.__lastElementFocused = target;
+            currentSpatialNavigationContainer = nextSpatialNavigationContainer;
+            currentSpatialNavigationContainer.__lastElementFocused = target;
 
-        requestAnimationFrame(async () => {
-            target.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
-            // if (isElementInViewport(target)) {
-            //     target.focus();
-            // }
+            requestAnimationFrame(async () => {
+                target.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+                // if (isElementInViewport(target)) {
+                //     target.focus();
+                // }
 
-            await new Promise((resolve) => {
-                const intersectionObserver = new IntersectionObserver(
-                    ([entry]) => {
-                        if (entry.isIntersecting) {
-                            resolve();
-                        }
-                    },
-                    {
-                        threshold: 1,
-                    },
-                );
-                intersectionObserver.observe(target);
+                await new Promise((resolve) => {
+                    const intersectionObserver = new IntersectionObserver(
+                        ([entry]) => {
+                            if (entry.isIntersecting) {
+                                resolve();
+                            }
+                        },
+                        {
+                            threshold: 1,
+                        },
+                    );
+                    intersectionObserver.observe(target);
+                });
+
+                target.focus();
             });
-
-            target.focus();
-        });
-    }
-});
-
-document.addEventListener('keyup', (event) => {
-    if (event.keyCode === 13) {
-        event.preventDefault();
-        if (document.activeElement) {
-            document.activeElement.click();
         }
-    }
-});
+    });
+
+    document.addEventListener('keyup', (event) => {
+        if (event.keyCode === 13) {
+            event.preventDefault();
+            if (document.activeElement) {
+                document.activeElement.click();
+            }
+        }
+    });
+};
 
 // console.log('1');
 

@@ -1,6 +1,6 @@
 {
   "name": "@frntnd/spatnav",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "dist/spatnav.cjs.js",
   "module": "dist/spatnav.es.js",
   "devDependencies": {
