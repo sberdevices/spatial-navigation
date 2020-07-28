@@ -1,8 +1,7 @@
 {
   "name": "@frntnd/spatnav",
-  "version": "0.0.2",
-  "main": "dist/spatnav.cjs.js",
-  "module": "dist/spatnav.es.js",
+  "version": "0.0.4",
+  "main": "build/spatnav.js",
   "devDependencies": {
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
@@ -14,11 +13,10 @@
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1",
-    "rollup": "^2.10.0",
-    "typescript": "~3.7.2"
+    "typescript": "3.9.5"
   },
   "scripts": {
-    "build": "rollup -c",
+    "build": "tsc -p tsconfig.build.json",
     "start": "react-scripts start",
     "prepublishOnly": "npm run build",
     "test": "react-scripts test"
@@ -39,6 +37,6 @@
     ]
   },
   "files": [
-    "dist"
+    "build"
   ]
 }

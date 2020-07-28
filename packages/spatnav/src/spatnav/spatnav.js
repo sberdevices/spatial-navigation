@@ -1962,6 +1962,17 @@
 export const setDefaultScrollTo = () => {
     let currentSpatialNavigationContainer = null;
 
+    function isElementInViewport(el) {
+        const rect = el.getBoundingClientRect();
+        return (
+            rect.top >= 0 &&
+            rect.left >= 0 &&
+            rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+            rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+        );
+    }
+
+
     document.addEventListener('navbeforefocus', (e) => {
         if (e.target instanceof HTMLElement) {
             e.preventDefault();
@@ -2007,16 +2018,17 @@ export const setDefaultScrollTo = () => {
             });
         }
     });
-
-    document.addEventListener('keyup', (event) => {
-        if (event.keyCode === 13) {
-            event.preventDefault();
-            if (document.activeElement) {
-                document.activeElement.click();
-            }
-        }
-    });
 };
+
+// обработчик нажатия `Enter` aka `кнопка OK` на пульте
+document.addEventListener('keyup', (event) => {
+    if (event.keyCode === 13) {
+        event.preventDefault();
+        if (document.activeElement) {
+            document.activeElement.click();
+        }
+    }
+});
 
 // console.log('1');
 
@@ -2032,13 +2044,3 @@ export const setDefaultScrollTo = () => {
 
 // start observing
 // intersectionObserver.observe());
-
-function isElementInViewport(el) {
-    const rect = el.getBoundingClientRect();
-    return (
-        rect.top >= 0 &&
-        rect.left >= 0 &&
-        rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-        rect.right <= (window.innerWidth || document.documentElement.clientWidth)
-    );
-}
