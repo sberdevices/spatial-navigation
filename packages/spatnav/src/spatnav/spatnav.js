@@ -177,7 +177,6 @@
 
         // 1
         const searchOrigin = findSearchOrigin();
-        console.log(searchOrigin);
         let eventTarget = searchOrigin;
         let elementFromPosition = null;
 
@@ -355,7 +354,6 @@
             }
         }
 
-        //   console.log(candidates)
         return option.mode === 'all' ? candidates : candidates.filter(isVisible);
     }
 
@@ -675,7 +673,6 @@
                 container = container.parentElement;
             }
 
-            // console.log(container, isContainer(container));
         } while (!isContainer(container));
         return container;
     }
@@ -792,7 +789,6 @@
             candidates: getSpatialNavigationCandidates(container, { mode: option }),
             container,
         };
-        //   console.log(currentOption)
 
         while (parentContainer) {
             if (focusingController(eventTarget.spatialNavigationSearch(dir, currentOption), dir)) {
@@ -2029,18 +2025,3 @@ document.addEventListener('keyup', (event) => {
         }
     }
 });
-
-// console.log('1');
-
-// let isIntersecting = false;
-// const intersectionObserver = new IntersectionObserver(([entry]) => {
-// console.log('2');
-//   isIntersecting = entry.isIntersecting;
-// }, {
-//   threshold: 1
-// });
-// intersectionObserver.observe($0)
-// console.log('3');
-
-// start observing
-// intersectionObserver.observe());
