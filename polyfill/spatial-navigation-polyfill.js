@@ -23,6 +23,15 @@
   let savedSearchOrigin = {element: null, rect: null};  // Saves previous search origin
   let searchOriginRect = null;  // Rect of current search origin
 
+  window.__getSpatNavState = () => {
+    return {
+      mapOfBoundRect,
+      startingPoint,
+      savedSearchOrigin,
+      searchOriginRect,
+    };
+  };
+
   /**
    * Initiate the spatial navigation features of the polyfill.
    * @function initiateSpatialNavigation
@@ -175,7 +184,7 @@
     }
 
     // 4
-    if (eventTarget === document || eventTarget === document.documentElement) {
+    if (eventTarget === window || eventTarget === document || eventTarget === document.documentElement) {
       eventTarget = document.body || document.documentElement;
     }
 
@@ -188,7 +197,8 @@
       if (eventTarget.nodeName === 'IFRAME') {
         eventTarget = eventTarget.contentDocument.documentElement;
       }
-      container = eventTarget;
+
+      container = container === window ? document.body : eventTarget;
       let bestInsideCandidate = null;
 
       // 5-2
@@ -592,6 +602,7 @@
       } else {
         container = container.parentElement;
       }
+
     } while (!isContainer(container));
     return container;
   }
@@ -686,7 +697,8 @@
    * @returns {string} auto | focus | scroll
    */
   function getCSSSpatNavAction(element) {
-    return readCssVar(element, 'spatial-navigation-action') || 'auto';
+    return 'focus';
+    //   return readCssVar(element, 'spatial-navigation-action') || 'auto';
   }
 
   /**
@@ -1130,7 +1142,7 @@
       rightBottom: [elementRect.right - offsetX, elementRect.bottom - offsetY]
     };
 
-    for(const point in hitTestPoint) {
+    for (const point in hitTestPoint) {
       const elemFromPoint = element.ownerDocument.elementFromPoint(...hitTestPoint[point]);
       if (element === elemFromPoint || element.contains(elemFromPoint)) {
         return true;
@@ -1570,7 +1582,7 @@
    * @param {Node} targetElement
    * @returns {sequence<Node>}  overlappedCandidates
    */
-  function getOverlappedCandidates(targetElement) {      
+  function getOverlappedCandidates(targetElement) {
     const container = targetElement.getSpatialNavigationContainer();
     const candidates = container.focusableAreas();
     const overlappedCandidates = [];
@@ -1742,9 +1754,80 @@
   }
 
   initiateSpatialNavigation();
-  enableExperimentalAPIs(false);
-  
+  enableExperimentalAPIs(true);
+
   window.addEventListener('load', () => {
     spatialNavigationHandler();
   });
 })();
+
+export const setDefaultScrollTo = () => {
+  let currentSpatialNavigationContainer = null;
+
+  function isElementInViewport(el) {
+    const rect = el.getBoundingClientRect();
+    return (
+      rect.top >= 0 &&
+      rect.left >= 0 &&
+      rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+      rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+    );
+  }
+
+
+  document.addEventListener('navbeforefocus', (e) => {
+    if (e.target instanceof HTMLElement) {
+      e.preventDefault();
+
+      let { target } = e;
+
+      // focus on the first element when changing spatnav container
+      const nextSpatialNavigationContainer = target.getSpatialNavigationContainer();
+
+      if (currentSpatialNavigationContainer && currentSpatialNavigationContainer !== nextSpatialNavigationContainer) {
+        if (nextSpatialNavigationContainer.__lastElementFocused) {
+          target = nextSpatialNavigationContainer.__lastElementFocused;
+        } else {
+          [target] = nextSpatialNavigationContainer.focusableAreas({ mode: 'all' });
+        }
+        // target.focus();
+      }
+
+      currentSpatialNavigationContainer = nextSpatialNavigationContainer;
+      currentSpatialNavigationContainer.__lastElementFocused = target;
+
+      requestAnimationFrame(async () => {
+        target.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+        // if (isElementInViewport(target)) {
+        //     target.focus();
+        // }
+
+        await new Promise((resolve) => {
+          const intersectionObserver = new IntersectionObserver(
+            ([entry]) => {
+              if (entry.isIntersecting) {
+                resolve();
+              }
+            },
+            {
+              threshold: 1,
+            },
+          );
+          intersectionObserver.observe(target);
+        });
+
+        target.focus();
+      });
+    }
+  });
+};
+
+// обработчик нажатия `Enter` aka `кнопка OK` на пульте
+document.addEventListener('keyup', (event) => {
+  if (event.keyCode === 13) {
+    event.preventDefault();
+    if (document.activeElement) {
+      document.activeElement.click();
+    }
+  }
+});
