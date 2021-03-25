@@ -100,7 +100,8 @@
          */
         window.addEventListener('keydown', (e) => {
             const currentKeyMode =
-                (parent && parent.__spatialNavigation__.keyMode) || window.__spatialNavigation__.keyMode;
+                (parent && parent.__spatialNavigation__ && parent.__spatialNavigation__.keyMode) ||
+                (window.__spatialNavigation__ && window.__spatialNavigation__.keyMode);
             const eventTarget = document.activeElement;
             const dir = ARROW_KEY_CODE[e.keyCode];
 
