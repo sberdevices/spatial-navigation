@@ -1,6 +1,6 @@
 {
   "name": "@sberdevices/spatial-navigation",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A polyfill for the spatial navigation",
   "main": "polyfill/spatial-navigation-polyfill.js",
   "directories": {
