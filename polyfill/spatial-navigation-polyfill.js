@@ -2020,9 +2020,13 @@ export const setDefaultScrollTo = () => {
 // обработчик нажатия `Enter` aka `кнопка OK` на пульте
 document.addEventListener('keyup', (event) => {
     if (event.keyCode === 13) {
-        event.preventDefault();
         if (document.activeElement) {
-            document.activeElement.click();
+            const tagName = document.activeElement.tagName;
+            // необходимо обработать этот кейс, т.к. на кнопке событие не должно срабатывать дважды
+            if (tagName !== 'BUTTON' && !document.activeElement.disabled) {
+                event.preventDefault();
+                document.activeElement.click();
+            }
         }
     }
 });
